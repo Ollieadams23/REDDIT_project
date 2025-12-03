@@ -1,38 +1,111 @@
+/**
+ * App Styles
+ * 
+ * Main layout and design following our wireframes:
+ * - Reddit orange (#FF4500) theme
+ * - Light gray background (#DAE0E6)
+ * - Clean, modern design
+ * - Responsive for all screen sizes
+ */
+
+/* 
+ * Main app container
+ */
 .App {
+  min-height: 100vh;
+  background-color: #DAE0E6;
+}
+
+/* 
+ * Header section
+ */
+.App-header {
+  background-color: #FF4500;
+  color: white;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.App-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.App-header p {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* 
+ * Main content area
+ */
+.App-main {
+  padding: 24px;
+}
+
+/* 
+ * Container for posts (max width for readability)
+ */
+.App-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.App-container h2 {
+  color: #1C1C1C;
+  font-size: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+/* 
+ * Posts list container
+ */
+.App-posts {
+  /* PostCard components will stack vertically here */
+}
+
+/* 
+ * Responsive Design - Tablet
+ */
+@media screen and (max-width: 768px) {
+  .App-main {
+    padding: 16px;
+  }
+
+  .App-header h1 {
+    font-size: 24px;
+  }
+
+  .App-container h2 {
+    font-size: 20px;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* 
+ * Responsive Design - Mobile
+ */
+@media screen and (max-width: 480px) {
+  .App-main {
+    padding: 12px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .App-header {
+    padding: 16px;
+  }
+
+  .App-header h1 {
+    font-size: 20px;
+  }
+
+  .App-header p {
+    font-size: 12px;
+  }
+
+  .App-container h2 {
+    font-size: 18px;
   }
 }

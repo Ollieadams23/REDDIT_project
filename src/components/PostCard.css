@@ -1,0 +1,328 @@
+/**
+ * PostCard Styles
+ * 
+ * This CSS follows our wireframe design with:
+ * - Reddit orange (#FF4500) as primary color
+ * - Clean, card-based layout
+ * - Responsive design (works on all screen sizes)
+ * - Smooth hover effects
+ * - Accessibility features
+ */
+
+/* 
+ * Main card container
+ * 
+ * Uses flexbox for layout:
+ * - Votes on the left
+ * - Thumbnail next
+ * - Content fills remaining space
+ */
+.post-card {
+  display: flex;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  /* Remove default button styling since we use role="button" */
+  text-align: left;
+}
+
+/* 
+ * Hover effect - elevate the card
+ * Makes it clear this is clickable
+ */
+.post-card:hover {
+  border-color: #FF4500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* 
+ * Focus state for keyboard navigation
+ * Important for accessibility!
+ */
+.post-card:focus {
+  outline: 2px solid #FF4500;
+  outline-offset: 2px;
+}
+
+/* 
+ * Votes section - left side of card
+ * Vertical layout with up arrow, score, down arrow
+ */
+.post-card__votes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 12px;
+  min-width: 40px;
+}
+
+/* 
+ * Vote buttons (up/down arrows)
+ */
+.vote-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #878A8C;
+  padding: 4px;
+  transition: color 0.2s ease;
+  /* Remove default button styles */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Hover effects for vote buttons */
+.vote-button--up:hover {
+  color: #FF4500; /* Reddit orange for upvote */
+}
+
+.vote-button--down:hover {
+  color: #7193FF; /* Blue for downvote */
+}
+
+/* 
+ * Score display (number between arrows)
+ */
+.post-card__score {
+  font-size: 14px;
+  font-weight: bold;
+  color: #1C1C1C;
+  margin: 4px 0;
+}
+
+/* 
+ * Thumbnail section
+ */
+.post-card__thumbnail {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-right: 12px;
+  flex-shrink: 0; /* Don't let it shrink */
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #F6F7F8;
+}
+
+/* Thumbnail image */
+.post-card__thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 
+ * Placeholder for text posts (no image)
+ */
+.post-card__thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F6F7F8;
+}
+
+.post-card__thumbnail-icon {
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+/* 
+ * Video indicator (play button overlay)
+ */
+.post-card__video-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Click goes through to card */
+}
+
+/* 
+ * Content section (title, meta, comments)
+ * Takes up remaining space
+ */
+.post-card__content {
+  flex: 1;
+  min-width: 0; /* Allows text truncation to work */
+}
+
+/* 
+ * Post title
+ */
+.post-card__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  /* Allow title to wrap on multiple lines */
+  word-wrap: break-word;
+}
+
+/* 
+ * Metadata section (subreddit, author, time)
+ */
+.post-card__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #7C7C7C;
+  margin-bottom: 8px;
+  gap: 4px;
+}
+
+.post-card__subreddit {
+  font-weight: 600;
+  color: #1C1C1C;
+}
+
+.post-card__separator {
+  margin: 0 4px;
+  color: #7C7C7C;
+}
+
+.post-card__author,
+.post-card__time {
+  color: #7C7C7C;
+}
+
+/* 
+ * Comments section
+ */
+.post-card__comments {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #7C7C7C;
+  gap: 6px;
+}
+
+.post-card__comments-icon {
+  font-size: 16px;
+}
+
+/* 
+ * ========================================
+ * RESPONSIVE DESIGN - Mobile
+ * ========================================
+ * 
+ * On smaller screens (tablets and phones):
+ * - Reduce padding and margins
+ * - Make thumbnails smaller
+ * - Adjust font sizes
+ */
+
+/* Tablet (768px and below) */
+@media screen and (max-width: 768px) {
+  .post-card {
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+
+  .post-card__thumbnail {
+    width: 80px;
+    height: 80px;
+  }
+
+  .post-card__title {
+    font-size: 16px;
+  }
+}
+
+/* Mobile (480px and below) */
+@media screen and (max-width: 480px) {
+  .post-card {
+    padding: 8px;
+  }
+
+  /* Smaller vote section on mobile */
+  .post-card__votes {
+    min-width: 32px;
+    margin-right: 8px;
+  }
+
+  .vote-button {
+    font-size: 16px;
+  }
+
+  .post-card__score {
+    font-size: 12px;
+  }
+
+  /* Smaller thumbnail on mobile */
+  .post-card__thumbnail {
+    width: 64px;
+    height: 64px;
+    margin-right: 8px;
+  }
+
+  .post-card__thumbnail-icon {
+    font-size: 24px;
+  }
+
+  .post-card__video-indicator {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+
+  /* Smaller text on mobile */
+  .post-card__title {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .post-card__meta {
+    font-size: 11px;
+  }
+
+  .post-card__comments {
+    font-size: 12px;
+  }
+}
+
+/* 
+ * Very small phones (320px and below)
+ * Stack the layout vertically if needed
+ */
+@media screen and (max-width: 320px) {
+  .post-card {
+    flex-direction: column;
+  }
+
+  .post-card__votes {
+    flex-direction: row;
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 8px;
+    justify-content: center;
+  }
+
+  .post-card__score {
+    margin: 0 12px;
+  }
+
+  .post-card__thumbnail {
+    width: 100%;
+    height: 150px;
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+}
