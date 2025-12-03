@@ -1,13 +1,28 @@
+/**
+ * Main Entry Point
+ * 
+ * This file is where our React app starts.
+ * We wrap our App with the Redux Provider so all components
+ * can access the Redux store.
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// Import Redux Provider and our store
+import { Provider } from 'react-redux';
+import store from './app/store';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    {/* Provider makes Redux store available to all components */}
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>
 );
 
