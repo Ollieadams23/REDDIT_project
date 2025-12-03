@@ -1,0 +1,170 @@
+/**
+ * SearchBar Styles
+ * 
+ * Clean, modern search bar design with:
+ * - Rounded corners
+ * - Focus states for accessibility
+ * - Smooth animations
+ * - Responsive design
+ */
+
+/* 
+ * Form wrapper
+ */
+.search-bar {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+/* 
+ * Container holding icon, input, and clear button
+ * Uses flexbox for layout
+ */
+.search-bar__container {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 2px solid #CCCCCC;
+  border-radius: 24px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* 
+ * Focus state - highlight when input is focused
+ */
+.search-bar__container:focus-within {
+  border-color: #FF4500;
+  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.1);
+}
+
+/* 
+ * Search icon (magnifying glass)
+ */
+.search-bar__icon {
+  font-size: 18px;
+  color: #7C7C7C;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* 
+ * Search input field
+ */
+.search-bar__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #1C1C1C;
+  background: transparent;
+  padding: 8px 0;
+  width: 100%;
+}
+
+/* Placeholder text styling */
+.search-bar__input::placeholder {
+  color: #7C7C7C;
+  opacity: 0.7;
+}
+
+/* Remove browser default styles */
+.search-bar__input:focus {
+  outline: none;
+}
+
+/* 
+ * Clear button (X)
+ * Only visible when there's text in the input
+ */
+.search-bar__clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #7C7C7C;
+  padding: 4px;
+  margin-left: 8px;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+  /* Make it round */
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hover effect for clear button */
+.search-bar__clear:hover {
+  color: #FF4500;
+  background-color: rgba(255, 69, 0, 0.1);
+}
+
+/* Focus state for clear button */
+.search-bar__clear:focus {
+  outline: 2px solid #FF4500;
+  outline-offset: 2px;
+}
+
+/* 
+ * ========================================
+ * RESPONSIVE DESIGN - Mobile
+ * ========================================
+ */
+
+/* Tablet */
+@media screen and (max-width: 768px) {
+  .search-bar {
+    margin-bottom: 20px;
+  }
+
+  .search-bar__container {
+    padding: 8px 14px;
+  }
+
+  .search-bar__input {
+    font-size: 15px;
+  }
+}
+
+/* Mobile */
+@media screen and (max-width: 480px) {
+  .search-bar {
+    margin-bottom: 16px;
+  }
+
+  .search-bar__container {
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+
+  .search-bar__icon {
+    font-size: 16px;
+    margin-right: 10px;
+  }
+
+  .search-bar__input {
+    font-size: 14px;
+    padding: 6px 0;
+  }
+
+  .search-bar__clear {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+  }
+}
+
+/* Very small screens */
+@media screen and (max-width: 320px) {
+  .search-bar__container {
+    padding: 6px 10px;
+  }
+
+  .search-bar__icon {
+    margin-right: 8px;
+  }
+}
