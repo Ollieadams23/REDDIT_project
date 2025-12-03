@@ -47,14 +47,25 @@
 }
 
 /* 
- * Container for posts (max width for readability)
+ * Container for content with sidebar
  */
 .App-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
 
-.App-container h2 {
+/* 
+ * Main content area (beside sidebar)
+ */
+.App-content {
+  flex: 1;
+  min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.App-content h2 {
   color: #1C1C1C;
   font-size: 24px;
   margin-bottom: 16px;
@@ -65,7 +76,33 @@
  * Posts list container
  */
 .App-posts {
-  /* PostCard components will stack vertically here */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 
+ * Loading state
+ */
+.App-loading {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  color: #7C7C7C;
+  font-size: 18px;
+}
+
+/* 
+ * Error state
+ */
+.App-error {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #fff5f5;
+  border-radius: 8px;
+  color: #d32f2f;
+  font-size: 18px;
 }
 
 /* 
@@ -101,7 +138,11 @@
     font-size: 24px;
   }
 
-  .App-container h2 {
+  .App-container {
+    flex-direction: column;
+  }
+
+  .App-content h2 {
     font-size: 20px;
   }
 }
