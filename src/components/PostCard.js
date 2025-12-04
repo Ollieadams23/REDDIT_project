@@ -99,7 +99,7 @@ const PostCard = ({ post, onClick }) => {
       {/* Thumbnail section */}
       <div className="post-card__thumbnail">
         {post.thumbnail && post.thumbnail !== 'self' ? (
-          // Show image if available
+          // Show image or video thumbnail if available
           <img 
             src={post.thumbnail} 
             alt={post.title}
@@ -110,12 +110,14 @@ const PostCard = ({ post, onClick }) => {
         ) : (
           // Show placeholder for text posts
           <div className="post-card__thumbnail-placeholder">
-            <span className="post-card__thumbnail-icon">📄</span>
+            <span className="post-card__thumbnail-icon">
+              {post.is_video ? '🎬' : '📄'}
+            </span>
           </div>
         )}
         
         {/* Show video indicator if it's a video post */}
-        {post.isVideo && (
+        {post.is_video && (
           <div className="post-card__video-indicator">
             ▶️
           </div>

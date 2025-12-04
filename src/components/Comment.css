@@ -1,0 +1,302 @@
+/**
+ * Comment Component Styles
+ * 
+ * Reddit-style comment threading with:
+ * - Left border for visual hierarchy
+ * - Collapse/expand functionality
+ * - Hover effects
+ * - Responsive design
+ */
+
+/* 
+ * Main comment container
+ */
+.comment {
+  position: relative;
+  padding: 12px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 
+ * Visual thread line on the left
+ * Shows the comment hierarchy
+ */
+.comment__thread-line {
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #CCCCCC;
+  transition: background-color 0.2s ease;
+}
+
+.comment:hover .comment__thread-line {
+  background-color: #FF4500;
+}
+
+/* 
+ * Comment header with author, time, score
+ */
+.comment__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+/* 
+ * Collapse/expand button
+ */
+.comment__collapse-btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #CCCCCC;
+  background-color: #FFFFFF;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  color: #7C7C7C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.comment__collapse-btn:hover {
+  background-color: #F6F7F8;
+  border-color: #FF4500;
+  color: #FF4500;
+}
+
+.comment__collapse-btn:focus {
+  outline: 2px solid #FF4500;
+  outline-offset: 2px;
+}
+
+/* 
+ * Author name (styled as link)
+ */
+.comment__author {
+  font-weight: 600;
+  color: #FF4500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.comment__author:hover {
+  text-decoration: underline;
+}
+
+/* 
+ * Score (upvotes)
+ */
+.comment__score {
+  color: #7C7C7C;
+  font-size: 12px;
+}
+
+/* 
+ * Time ago
+ */
+.comment__time {
+  color: #7C7C7C;
+  font-size: 12px;
+}
+
+/* 
+ * Reply count (shown when collapsed)
+ */
+.comment__reply-count {
+  color: #7C7C7C;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* 
+ * Comment body text
+ */
+.comment__body {
+  margin-bottom: 8px;
+  padding-left: 28px;
+  color: #1C1C1C;
+  word-wrap: break-word;
+}
+
+.comment__body p {
+  margin: 0 0 8px 0;
+}
+
+.comment__body p:last-child {
+  margin-bottom: 0;
+}
+
+/* 
+ * Comment actions (vote, reply, share)
+ */
+.comment__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 28px;
+}
+
+/* 
+ * Vote buttons
+ */
+.comment__vote-btn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #7C7C7C;
+  transition: color 0.2s ease;
+  border-radius: 2px;
+}
+
+.comment__vote-btn:hover {
+  background-color: #F6F7F8;
+}
+
+.comment__vote-btn--up:hover {
+  color: #FF4500;
+}
+
+.comment__vote-btn--down:hover {
+  color: #7193FF;
+}
+
+.comment__vote-btn:focus {
+  outline: 2px solid #FF4500;
+  outline-offset: 2px;
+}
+
+/* 
+ * Reply and action buttons
+ */
+.comment__reply-btn,
+.comment__action-btn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7C7C7C;
+  transition: all 0.2s ease;
+  border-radius: 2px;
+}
+
+.comment__reply-btn:hover,
+.comment__action-btn:hover {
+  background-color: #F6F7F8;
+  color: #FF4500;
+}
+
+.comment__reply-btn:focus,
+.comment__action-btn:focus {
+  outline: 2px solid #FF4500;
+  outline-offset: 2px;
+}
+
+/* 
+ * Nested replies container
+ */
+.comment__replies {
+  margin-top: 8px;
+}
+
+/* 
+ * Depth-based color variations for thread lines
+ */
+.comment[data-depth="1"] .comment__thread-line {
+  background-color: #FF4500;
+}
+
+.comment[data-depth="2"] .comment__thread-line {
+  background-color: #7193FF;
+}
+
+.comment[data-depth="3"] .comment__thread-line {
+  background-color: #46D160;
+}
+
+.comment[data-depth="4"] .comment__thread-line {
+  background-color: #FFB000;
+}
+
+.comment[data-depth="5"] .comment__thread-line {
+  background-color: #EA0027;
+}
+
+/* 
+ * ========================================
+ * RESPONSIVE DESIGN
+ * ========================================
+ */
+
+/* Mobile devices */
+@media screen and (max-width: 480px) {
+  .comment {
+    font-size: 13px;
+    padding: 8px 0;
+  }
+
+  .comment__header {
+    gap: 6px;
+  }
+
+  .comment__collapse-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+  }
+
+  .comment__body {
+    padding-left: 24px;
+    font-size: 13px;
+  }
+
+  .comment__actions {
+    padding-left: 24px;
+    gap: 6px;
+  }
+
+  .comment__vote-btn,
+  .comment__reply-btn,
+  .comment__action-btn {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  /* Reduce indentation on mobile */
+  .comment[data-depth="1"] {
+    margin-left: 12px !important;
+  }
+
+  .comment[data-depth="2"] {
+    margin-left: 24px !important;
+  }
+
+  .comment[data-depth="3"] {
+    margin-left: 36px !important;
+  }
+
+  .comment[data-depth="4"] {
+    margin-left: 48px !important;
+  }
+
+  /* Max depth on mobile to prevent overflow */
+  .comment[data-depth="5"],
+  .comment[data-depth="6"],
+  .comment[data-depth="7"],
+  .comment[data-depth="8"] {
+    margin-left: 48px !important;
+  }
+}

@@ -9,11 +9,60 @@
  * - Error states (did something go wrong?)
  * - Actions to update the data
  * 
- * Think of it like a recipe book just for posts!
+ * Now integrated with real Reddit API!
  */
 
-import { createSlice } from '@reduxjs/toolkit';
-import { mockPosts } from '../../data/mockData';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchSubredditPosts, fetchPostWithComments, searchPosts as searchRedditPosts, normalizePost } from '../../services/redditAPI';
+
+/**
+ * Async Thunk: Fetch posts from Reddit API
+ * 
+ * createAsyncThunk automatically handles:
+ * - Dispatching 'pending' action when the request starts
+ * - Dispatching 'fulfilled' action when it succeeds
+ * - Dispatching 'rejected' action when it fails
+ */
+export const fetchPosts = createAsyncThunk(
+  'posts/fetchPosts',
+  async ({ subreddit = 'all', sort = 'hot', timeframe = 'day' }) => {
+    const { posts, after } = await fetchSubredditPosts(subreddit, sort, timeframe);
+    return { posts: posts.map(normalizePost), after };
+  }
+);
+
+/**
+ * Async Thunk: Load more posts (pagination)
+ */
+export const loadMorePosts = createAsyncThunk(
+  'posts/loadMorePosts',
+  async ({ subreddit = 'all', sort = 'hot', timeframe = 'day', after }) => {
+    const { posts, after: nextAfter } = await fetchSubredditPosts(subreddit, sort, timeframe, after);
+    return { posts: posts.map(normalizePost), after: nextAfter };
+  }
+);
+
+/**
+ * Async Thunk: Fetch a specific post with comments
+ */
+export const fetchPostDetails = createAsyncThunk(
+  'posts/fetchPostDetails',
+  async ({ subreddit, postId }) => {
+    const { post, comments } = await fetchPostWithComments(subreddit, postId);
+    return { post: normalizePost(post), comments };
+  }
+);
+
+/**
+ * Async Thunk: Search posts
+ */
+export const searchPosts = createAsyncThunk(
+  'posts/searchPosts',
+  async ({ query, subreddit = 'all', sort = 'relevance', timeframe = 'all' }) => {
+    const { posts } = await searchRedditPosts(query, subreddit, sort, timeframe);
+    return posts.map(normalizePost);
+  }
+);
 
 /**
  * Initial State
@@ -26,6 +75,15 @@ const initialState = {
   
   // Currently selected post (when viewing details)
   selectedPost: null,
+  
+  // Comments for the selected post
+  comments: [],
+  
+  // Pagination token for loading more posts
+  after: null,
+  
+  // Flag to track if we're loading more posts (vs initial load)
+  isLoadingMore: false,
   
   // Loading state: 'idle' | 'loading' | 'succeeded' | 'failed'
   // This helps us show loading spinners or error messages
@@ -50,60 +108,9 @@ const postsSlice = createSlice({
   initialState,
   
   /**
-   * Reducers - functions that change the state
-   * 
-   * Each reducer is like a command:
-   * - "Load these posts"
-   * - "Select this post"
-   * - "Handle this error"
+   * Reducers - synchronous state updates
    */
   reducers: {
-    /**
-     * loadPosts - Load the initial list of posts
-     * 
-     * For now, we're using mock data from mockData.js
-     * Later, we'll replace this with real API calls
-     */
-    loadPosts: (state) => {
-      // Set status to loading
-      state.status = 'loading';
-      
-      // Simulate loading delay (remove this later with real API)
-      // In real app, this happens automatically during the API call
-    },
-    
-    /**
-     * loadPostsSuccess - Called when posts load successfully
-     */
-    loadPostsSuccess: (state, action) => {
-      state.status = 'succeeded';
-      // action.payload contains the posts data
-      state.posts = action.payload;
-      state.error = null;
-    },
-    
-    /**
-     * loadPostsFailed - Called when loading posts fails
-     */
-    loadPostsFailed: (state, action) => {
-      state.status = 'failed';
-      // action.payload contains the error message
-      state.error = action.payload;
-    },
-    
-    /**
-     * selectPost - Select a post to view its details
-     * 
-     * When user clicks on a post card, we save it here
-     * so the PostDetail page can display it
-     */
-    selectPost: (state, action) => {
-      // action.payload is the post ID
-      const postId = action.payload;
-      // Find the post in our posts array
-      state.selectedPost = state.posts.find(post => post.id === postId);
-    },
-    
     /**
      * clearSelectedPost - Clear the selected post
      * 
@@ -111,45 +118,83 @@ const postsSlice = createSlice({
      */
     clearSelectedPost: (state) => {
       state.selectedPost = null;
+      state.comments = [];
     },
-    
-    /**
-     * searchPosts - Filter posts by search term
-     * 
-     * This is a simple client-side search
-     * Later, we'll use Reddit's search API instead
-     */
-    searchPosts: (state, action) => {
-      const searchTerm = action.payload.toLowerCase();
+  },
+  
+  /**
+   * Extra Reducers - handle async thunk actions
+   * 
+   * These automatically handle the lifecycle of async operations:
+   * - pending: when the API call starts
+   * - fulfilled: when it succeeds
+   * - rejected: when it fails
+   */
+  extraReducers: (builder) => {
+    builder
+      // Fetch posts
+      .addCase(fetchPosts.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+        state.isLoadingMore = false;
+      })
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.posts = action.payload.posts;
+        state.after = action.payload.after;
+        state.error = null;
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
       
-      if (!searchTerm) {
-        // If search is empty, show all posts
-        state.posts = mockPosts;
-      } else {
-        // Filter posts that match the search term
-        state.posts = mockPosts.filter(post =>
-          post.title.toLowerCase().includes(searchTerm) ||
-          post.selftext.toLowerCase().includes(searchTerm)
-        );
-      }
-    },
-    
-    /**
-     * filterBySubreddit - Show only posts from a specific subreddit
-     */
-    filterBySubreddit: (state, action) => {
-      const subreddit = action.payload;
+      // Load more posts (pagination)
+      .addCase(loadMorePosts.pending, (state) => {
+        state.isLoadingMore = true;
+        state.error = null;
+      })
+      .addCase(loadMorePosts.fulfilled, (state, action) => {
+        state.isLoadingMore = false;
+        state.posts = [...state.posts, ...action.payload.posts];
+        state.after = action.payload.after;
+        state.error = null;
+      })
+      .addCase(loadMorePosts.rejected, (state, action) => {
+        state.isLoadingMore = false;
+        state.error = action.error.message;
+      })
       
-      if (subreddit === 'all') {
-        // Show all posts
-        state.posts = mockPosts;
-      } else {
-        // Filter by subreddit
-        state.posts = mockPosts.filter(
-          post => post.subreddit.toLowerCase() === subreddit.toLowerCase()
-        );
-      }
-    },
+      // Fetch post details
+      .addCase(fetchPostDetails.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchPostDetails.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.selectedPost = action.payload.post;
+        state.comments = action.payload.comments;
+        state.error = null;
+      })
+      .addCase(fetchPostDetails.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      
+      // Search posts
+      .addCase(searchPosts.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(searchPosts.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.posts = action.payload;
+        state.error = null;
+      })
+      .addCase(searchPosts.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
   },
 });
 
@@ -157,16 +202,9 @@ const postsSlice = createSlice({
  * Export actions
  * 
  * These are the functions components will call to update the state
- * Example: dispatch(loadPosts())
  */
 export const {
-  loadPosts,
-  loadPostsSuccess,
-  loadPostsFailed,
-  selectPost,
   clearSelectedPost,
-  searchPosts,
-  filterBySubreddit,
 } = postsSlice.actions;
 
 /**
@@ -191,22 +229,17 @@ export const selectPostsError = (state) => state.posts.error;
 // Check if posts are loading
 export const selectIsLoading = (state) => state.posts.status === 'loading';
 
-/**
- * Thunk to load posts with mock data
- * 
- * A "thunk" is a function that does async work (like API calls)
- * For now, we're just using setTimeout to simulate loading
- */
-export const fetchPosts = () => (dispatch) => {
-  // Tell Redux we're starting to load
-  dispatch(loadPosts());
-  
-  // Simulate API delay (500ms)
-  setTimeout(() => {
-    // After "loading", dispatch success with mock data
-    dispatch(loadPostsSuccess(mockPosts));
-  }, 500);
-};
+// Check if loading more posts
+export const selectIsLoadingMore = (state) => state.posts.isLoadingMore;
+
+// Get pagination token
+export const selectAfter = (state) => state.posts.after;
+
+// Check if there are more posts to load
+export const selectHasMore = (state) => state.posts.after !== null;
+
+// Get comments for selected post
+export const selectComments = (state) => state.posts.comments;
 
 // Export the reducer (this goes into the store)
 export default postsSlice.reducer;
