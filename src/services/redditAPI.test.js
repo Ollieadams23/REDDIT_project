@@ -86,10 +86,9 @@ describe('Reddit API Service', () => {
         'previous_token'
       );
 
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('after=previous_token'),
-        expect.any(Object)
-      );
+      // Check that fetch was called with after parameter (URL is fully encoded by corsproxy)
+      const fetchUrl = fetch.mock.calls[0][0];
+      expect(fetchUrl).toContain('after%3Dprevious_token'); // URL encoded version
       expect(result.after).toBe('next_page_token');
     });
   });
@@ -142,10 +141,9 @@ describe('Reddit API Service', () => {
 
       await redditAPI.searchPosts('test', 'all', 'relevance', 'all', 'after_token');
 
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('after=after_token'),
-        expect.any(Object)
-      );
+      // Check that fetch was called with after parameter (URL is fully encoded by corsproxy)
+      const fetchUrl = fetch.mock.calls[0][0];
+      expect(fetchUrl).toContain('after%3Dafter_token'); // URL encoded version
     });
   });
 

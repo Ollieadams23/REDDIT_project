@@ -132,13 +132,14 @@ describe('PostCard', () => {
   test('shows video indicator for video posts', () => {
     const videoPost = {
       ...mockPost,
-      isVideo: true,
+      is_video: true, // Changed from isVideo to is_video
+      thumbnail: '', // No thumbnail for video posts
     };
     
     render(<PostCard post={videoPost} onClick={mockOnClick} />);
     
-    // Should show the play button
-    const videoIndicator = screen.getByText('▶️');
+    // Should show the video/film emoji
+    const videoIndicator = screen.getByText('🎬');
     expect(videoIndicator).toBeInTheDocument();
   });
 
