@@ -13,20 +13,32 @@ function ScrollToTop() {
 
   /**
    * Show button when page is scrolled down 300px
+   * Uses throttling to improve performance (only checks every 100ms)
    */
   useEffect(() => {
+    let timeoutId = null;
+    
     const toggleVisibility = () => {
-      if (window.pageYOffset > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
+      // Throttle: only run once per 100ms
+      if (timeoutId === null) {
+        timeoutId = setTimeout(() => {
+          if (window.pageYOffset > 300) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
+          timeoutId = null;
+        }, 100);
       }
     };
 
-    window.addEventListener('scroll', toggleVisibility);
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
 
     // Cleanup listener on unmount
-    return () => window.removeEventListener('scroll', toggleVisibility);
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   /**

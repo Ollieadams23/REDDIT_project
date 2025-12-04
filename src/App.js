@@ -7,17 +7,26 @@
  * - PostCard list displaying filtered results
  * - PostDetail view for individual posts with comments
  * - Redux state management for filters
+ * 
+ * Performance Optimizations:
+ * - PostDetail lazy loaded with React.lazy (code splitting)
+ * - PostCard wrapped with React.memo (prevents unnecessary re-renders)
+ * - useCallback for event handlers (stable references)
+ * - Throttled scroll events in ScrollToTop
+ * - Suspense fallback for lazy components
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, Suspense, lazy } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import './App.css';
 import PostCard from './components/PostCard';
 import PostCardSkeleton from './components/PostCardSkeleton';
-import PostDetail from './components/PostDetail';
 import SearchBar from './components/SearchBar';
 import Sidebar from './components/Sidebar';
 import ScrollToTop from './components/ScrollToTop';
+
+// Code splitting: Lazy load PostDetail since it's only needed when viewing a post
+const PostDetail = lazy(() => import('./components/PostDetail'));
 import { fetchPosts, loadMorePosts, searchPosts as searchPostsThunk, loadMoreSearchResults } from './features/posts/postsSlice';
 import { 
   setSubreddit, 
@@ -152,27 +161,30 @@ function App() {
   /**
    * Handle when a post card is clicked
    * Shows the post detail view
+   * Memoized with useCallback to prevent unnecessary re-renders of PostCard
    */
-  const handlePostClick = (postId) => {
+  const handlePostClick = useCallback((postId) => {
     setSelectedPostId(postId);
     // Scroll to top when opening post detail
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
   /**
    * Handle going back to feed from post detail
+   * Memoized with useCallback
    */
-  const handleBackToFeed = () => {
+  const handleBackToFeed = useCallback(() => {
     setSelectedPostId(null);
-  };
+  }, []);
 
   /**
    * RESPONSIVE: Toggle mobile menu
    * This opens/closes the sidebar on mobile devices
+   * Memoized with useCallback
    */
-  const handleToggleMobileMenu = () => {
+  const handleToggleMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  }, [isMobileMenuOpen]);
 
   /**
    * Handle loading more posts
@@ -213,13 +225,20 @@ function App() {
           <p>A React & Redux app for browsing Reddit</p>
         </header>
 
-        {/* Post Detail View */}
+        {/* Post Detail View with lazy loading */}
         <main className="App-main">
           <div className="App-container App-container--detail">
-            <PostDetail 
-              postId={selectedPostId}
-              onBack={handleBackToFeed}
-            />
+            <Suspense fallback={
+              <div className="App-loading">
+                <PostCardSkeleton />
+                <PostCardSkeleton />
+              </div>
+            }>
+              <PostDetail 
+                postId={selectedPostId}
+                onBack={handleBackToFeed}
+              />
+            </Suspense>
           </div>
         </main>
       </div>

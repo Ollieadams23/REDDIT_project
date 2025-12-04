@@ -18,8 +18,10 @@ import './PostCardSkeleton.css';
  * 
  * Displays a single skeleton card
  * Usually rendered multiple times (3-5) to fill the screen
+ * 
+ * Wrapped with React.memo since it has no props and never changes
  */
-const PostCardSkeleton = () => {
+const PostCardSkeleton = React.memo(() => {
   return (
     <div className="post-card-skeleton">
       {/* Vote section placeholder */}
@@ -50,6 +52,8 @@ const PostCardSkeleton = () => {
       </div>
     </div>
   );
-};
+});
+
+PostCardSkeleton.displayName = 'PostCardSkeleton';
 
 export default PostCardSkeleton;

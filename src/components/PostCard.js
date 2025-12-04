@@ -26,8 +26,11 @@ import './PostCard.css';
 
 /**
  * PostCard Component
+ * 
+ * Wrapped with React.memo to prevent unnecessary re-renders.
+ * Only re-renders when post data or onClick function changes.
  */
-const PostCard = ({ post, onClick }) => {
+const PostCard = React.memo(({ post, onClick }) => {
   /**
    * Handle card click
    * When user clicks anywhere on the card, call the onClick function
@@ -161,6 +164,8 @@ const PostCard = ({ post, onClick }) => {
       </div>
     </article>
   );
-};
+});
+
+PostCard.displayName = 'PostCard';
 
 export default PostCard;
