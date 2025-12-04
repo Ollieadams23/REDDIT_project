@@ -24,9 +24,6 @@ import PostCardSkeleton from './components/PostCardSkeleton';
 import SearchBar from './components/SearchBar';
 import Sidebar from './components/Sidebar';
 import ScrollToTop from './components/ScrollToTop';
-
-// Code splitting: Lazy load PostDetail since it's only needed when viewing a post
-const PostDetail = lazy(() => import('./components/PostDetail'));
 import { fetchPosts, loadMorePosts, searchPosts as searchPostsThunk, loadMoreSearchResults } from './features/posts/postsSlice';
 import { 
   setSubreddit, 
@@ -39,6 +36,9 @@ import {
   selectTimeFilter,
   selectSearchTerm
 } from './features/filters/filtersSlice';
+
+// Code splitting: Lazy load PostDetail since it's only needed when viewing a post
+const PostDetail = lazy(() => import('./components/PostDetail'));
 
 function App() {
   /**
