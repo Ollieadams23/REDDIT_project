@@ -9,11 +9,28 @@
  */
 
 /* 
- * Main app container
+ * Smooth scrolling for entire page
+ */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 
+ * Main app container with fade-in animation
  */
 .App {
   min-height: 100vh;
   background-color: #DAE0E6;
+  animation: fadeInPage 0.3s ease;
+}
+
+@keyframes fadeInPage {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* 
@@ -71,11 +88,18 @@
 }
 
 .App-mobile-menu-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
 }
 
 .App-mobile-menu-btn:active {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: scale(0.95);
+}
+
+.App-mobile-menu-btn:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
 }
 
 /* 
@@ -135,6 +159,16 @@
   background-color: rgba(0, 0, 0, 0.5); /* 50% black */
   z-index: 999; /* Below sidebar (1000), above content */
   cursor: pointer; /* Indicates it's clickable */
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* 
@@ -161,12 +195,34 @@
 }
 
 /* 
- * Posts list container
+ * Posts container with staggered animations
  */
 .App-posts {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* Fade in posts with stagger effect */
+.App-posts > * {
+  animation: fadeInUp 0.4s ease backwards;
+}
+
+.App-posts > *:nth-child(1) { animation-delay: 0.05s; }
+.App-posts > *:nth-child(2) { animation-delay: 0.1s; }
+.App-posts > *:nth-child(3) { animation-delay: 0.15s; }
+.App-posts > *:nth-child(4) { animation-delay: 0.2s; }
+.App-posts > *:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 
@@ -228,11 +284,21 @@
 .App-load-more-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  animation: pulse 1.5s ease infinite;
 }
 
 .App-load-more-btn:focus {
   outline: 2px solid #FF4500;
   outline-offset: 2px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 /* 
@@ -244,6 +310,7 @@
   background-color: #ffffff;
   border-radius: 8px;
   color: #7C7C7C;
+  animation: fadeInUp 0.5s ease;
 }
 
 .App-empty-state p:first-child {

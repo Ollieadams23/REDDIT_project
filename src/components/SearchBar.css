@@ -101,6 +101,12 @@
 .search-bar__clear:hover {
   color: #FF4500;
   background-color: rgba(255, 69, 0, 0.1);
+  transform: scale(1.1);
+}
+
+/* Active state */
+.search-bar__clear:active {
+  transform: scale(0.95);
 }
 
 /* Focus state for clear button */

@@ -59,8 +59,25 @@ export const fetchPostDetails = createAsyncThunk(
 export const searchPosts = createAsyncThunk(
   'posts/searchPosts',
   async ({ query, subreddit = 'all', sort = 'relevance', timeframe = 'all' }) => {
-    const { posts } = await searchRedditPosts(query, subreddit, sort, timeframe);
-    return posts.map(normalizePost);
+    const { posts, after } = await searchRedditPosts(query, subreddit, sort, timeframe);
+    return { posts: posts.map(normalizePost), after };
+  }
+);
+
+/**
+ * Async Thunk: Load more search results
+ */
+export const loadMoreSearchResults = createAsyncThunk(
+  'posts/loadMoreSearchResults',
+  async ({ query, subreddit = 'all', sort = 'relevance', timeframe = 'all', after }) => {
+    const { posts, after: nextAfter } = await searchRedditPosts(
+      query, 
+      subreddit, 
+      sort, 
+      timeframe, 
+      after
+    );
+    return { posts: posts.map(normalizePost), after: nextAfter };
   }
 );
 
@@ -185,14 +202,32 @@ const postsSlice = createSlice({
       .addCase(searchPosts.pending, (state) => {
         state.status = 'loading';
         state.error = null;
+        state.isLoadingMore = false;
       })
       .addCase(searchPosts.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.posts = action.payload;
+        state.posts = action.payload.posts;
+        state.after = action.payload.after;
         state.error = null;
       })
       .addCase(searchPosts.rejected, (state, action) => {
         state.status = 'failed';
+        state.error = action.error.message;
+      })
+      
+      // Load more search results (pagination)
+      .addCase(loadMoreSearchResults.pending, (state) => {
+        state.isLoadingMore = true;
+        state.error = null;
+      })
+      .addCase(loadMoreSearchResults.fulfilled, (state, action) => {
+        state.isLoadingMore = false;
+        state.posts = [...state.posts, ...action.payload.posts];
+        state.after = action.payload.after;
+        state.error = null;
+      })
+      .addCase(loadMoreSearchResults.rejected, (state, action) => {
+        state.isLoadingMore = false;
         state.error = action.error.message;
       });
   },

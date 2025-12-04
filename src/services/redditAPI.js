@@ -151,16 +151,23 @@ const parseComments = (commentsData) => {
  * @param {string} subreddit - Subreddit to search in (default: 'all')
  * @param {string} sort - Sort type: 'relevance', 'hot', 'top', 'new', 'comments'
  * @param {string} timeframe - Time filter: 'hour', 'day', 'week', 'month', 'year', 'all'
+ * @param {string} after - Pagination token for loading more results
  * @returns {Promise<Object>} Search results
  */
 export const searchPosts = async (
   query,
   subreddit = 'all',
   sort = 'relevance',
-  timeframe = 'all'
+  timeframe = 'all',
+  after = null
 ) => {
   try {
-    const url = `${REDDIT_BASE_URL}/r/${subreddit}/search.json?q=${encodeURIComponent(query)}&sort=${sort}&t=${timeframe}&limit=25`;
+    let url = `${REDDIT_BASE_URL}/r/${subreddit}/search.json?q=${encodeURIComponent(query)}&sort=${sort}&t=${timeframe}&limit=25`;
+    
+    // Add pagination token if provided
+    if (after) {
+      url += `&after=${after}`;
+    }
     
     const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`, {
       headers: REDDIT_HEADERS,

@@ -125,11 +125,16 @@
 
 .sidebar__option:hover {
   background-color: #F6F7F8;
+  transform: translateX(4px);
 }
 
 .sidebar__option:focus {
   outline: 2px solid #FF4500;
   outline-offset: -2px;
+}
+
+.sidebar__option:active {
+  transform: translateX(2px);
 }
 
 /* 

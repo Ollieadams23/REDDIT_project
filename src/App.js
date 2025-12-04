@@ -17,7 +17,8 @@ import PostCardSkeleton from './components/PostCardSkeleton';
 import PostDetail from './components/PostDetail';
 import SearchBar from './components/SearchBar';
 import Sidebar from './components/Sidebar';
-import { fetchPosts, loadMorePosts, searchPosts as searchPostsThunk } from './features/posts/postsSlice';
+import ScrollToTop from './components/ScrollToTop';
+import { fetchPosts, loadMorePosts, searchPosts as searchPostsThunk, loadMoreSearchResults } from './features/posts/postsSlice';
 import { 
   setSubreddit, 
   setSortBy, 
@@ -175,13 +176,20 @@ function App() {
 
   /**
    * Handle loading more posts
+   * Works for both regular browsing and search results
    */
   const handleLoadMore = () => {
     if (searchTerm && searchTerm.trim()) {
-      // For search, we'd need to implement search pagination
-      // Reddit search API also supports 'after' parameter
-      console.log('Search pagination not yet implemented');
+      // Load more search results
+      dispatch(loadMoreSearchResults({ 
+        query: searchTerm,
+        subreddit: selectedSubreddit, 
+        sort: sortBy, 
+        timeframe: timeFilter,
+        after: after
+      }));
     } else {
+      // Load more regular posts
       dispatch(loadMorePosts({ 
         subreddit: selectedSubreddit, 
         sort: sortBy, 
@@ -329,6 +337,9 @@ function App() {
           </div>
         </div>
       </main>
+
+      {/* Scroll to top button */}
+      <ScrollToTop />
     </div>
   );
 }
