@@ -54,14 +54,11 @@ function App() {
   }, [dispatch]);
 
   /**
-   * Filter posts based on all criteria:
-   * - Search term (title or body)
-   * - Subreddit selection
-   * - Sort order
-   * - Time filter (when sort is 'top')
+   * Step 1: Filter posts based on search and subreddit
+   * This reduces the list before sorting
    */
-  const filteredPosts = posts.filter((post) => {
-    // Filter by search term
+  let filteredPosts = posts.filter((post) => {
+    // Filter by search term (checks both title and body)
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
       const titleMatch = post.title.toLowerCase().includes(lowerSearch);
@@ -76,10 +73,114 @@ function App() {
       }
     }
     
-    // TODO: Apply sort order (hot, new, top, rising)
-    // TODO: Apply time filter (when sortBy is 'top')
-    
     return true;
+  });
+
+  /**
+   * Step 2: Apply time filter (only for 'top' sort)
+   * 
+   * When user selects "Top", they can choose a time period.
+   * We filter out posts older than the selected period.
+   */
+  if (sortBy === 'top' && timeFilter !== 'all') {
+    const now = Date.now() / 1000; // Current time in seconds
+    let timeThreshold = 0;
+    
+    // Calculate how far back to look based on selected time filter
+    switch (timeFilter) {
+      case 'hour':
+        timeThreshold = now - (60 * 60); // 1 hour ago
+        break;
+      case 'day':
+        timeThreshold = now - (24 * 60 * 60); // 24 hours ago
+        break;
+      case 'week':
+        timeThreshold = now - (7 * 24 * 60 * 60); // 7 days ago
+        break;
+      case 'month':
+        timeThreshold = now - (30 * 24 * 60 * 60); // 30 days ago
+        break;
+      case 'year':
+        timeThreshold = now - (365 * 24 * 60 * 60); // 365 days ago
+        break;
+      default:
+        timeThreshold = 0; // 'all' - no filtering
+    }
+    
+    // Keep only posts created after the threshold time
+    if (timeThreshold > 0) {
+      filteredPosts = filteredPosts.filter((post) => post.created > timeThreshold);
+    }
+  }
+
+  /**
+   * Step 3: Sort the filtered posts based on selected sort order
+   * 
+   * Different sort algorithms:
+   * - 'hot': Combination of upvotes and recency (most engaging recent posts)
+   * - 'new': Most recent posts first
+   * - 'top': Highest upvotes (within time period if specified)
+   * - 'rising': Posts gaining upvotes quickly
+   */
+  const sortedPosts = [...filteredPosts].sort((a, b) => {
+    switch (sortBy) {
+      case 'new':
+        // Sort by creation time, newest first
+        // post.created is a Unix timestamp (seconds since 1970)
+        return b.created - a.created;
+      
+      case 'top':
+        // Sort by total upvotes, highest first
+        // post.ups is the upvote count
+        return b.ups - a.ups;
+      
+      case 'rising':
+        /**
+         * Rising algorithm: Recent posts with growing engagement
+         * 
+         * Formula: (upvotes / age_in_hours) * recency_bonus
+         * - Posts with more upvotes score higher
+         * - Newer posts get a bonus multiplier
+         * - Very new posts (< 1 hour) get extra boost
+         */
+        const now = Date.now() / 1000;
+        
+        // Calculate score for post A
+        const ageA = Math.max(1, (now - a.created) / 3600); // Age in hours (minimum 1)
+        const recencyBonusA = ageA < 1 ? 2 : 1; // Double score if less than 1 hour old
+        const scoreA = (a.ups / ageA) * recencyBonusA;
+        
+        // Calculate score for post B
+        const ageB = Math.max(1, (now - b.created) / 3600);
+        const recencyBonusB = ageB < 1 ? 2 : 1;
+        const scoreB = (b.ups / ageB) * recencyBonusB;
+        
+        return scoreB - scoreA; // Higher score first
+      
+      case 'hot':
+      default:
+        /**
+         * Hot algorithm: Balance between popularity and recency
+         * 
+         * This is simplified from Reddit's actual algorithm but captures the idea:
+         * - Popular posts (high upvotes) rank higher
+         * - Recent posts get a boost
+         * - Uses logarithmic scale so mega-popular posts don't dominate forever
+         */
+        const nowHot = Date.now() / 1000;
+        
+        // Calculate "hotness" score for post A
+        const ageInHoursA = Math.max(1, (nowHot - a.created) / 3600);
+        const voteScoreA = Math.log10(Math.max(1, a.ups)); // Logarithmic scale
+        const hotScoreA = voteScoreA / Math.pow(ageInHoursA, 1.5); // Age penalty
+        
+        // Calculate "hotness" score for post B
+        const ageInHoursB = Math.max(1, (nowHot - b.created) / 3600);
+        const voteScoreB = Math.log10(Math.max(1, b.ups));
+        const hotScoreB = voteScoreB / Math.pow(ageInHoursB, 1.5);
+        
+        return hotScoreB - hotScoreA; // Higher score first
+    }
   });
 
   /**
@@ -100,18 +201,21 @@ function App() {
 
   /**
    * Handle when sort order changes
+   * 
+   * Updates Redux state which triggers re-sorting
    */
   const handleSortChange = (sort) => {
     dispatch(setSortBy(sort));
-    // TODO: Apply sorting logic
   };
 
   /**
    * Handle when time filter changes
+   * 
+   * Updates Redux state which triggers re-filtering
+   * Only applies when sortBy is 'top'
    */
   const handleTimeFilterChange = (time) => {
     dispatch(setTimeFilter(time));
-    // TODO: Apply time filtering logic
   };
 
   /**
@@ -165,9 +269,9 @@ function App() {
             {/* Results header */}
             <h2>
               {searchTerm 
-                ? `Search results for "${searchTerm}" (${filteredPosts.length})`
+                ? `Search results for "${searchTerm}" (${sortedPosts.length})`
                 : selectedSubreddit !== 'all'
-                  ? `r/${selectedSubreddit} (${filteredPosts.length})`
+                  ? `r/${selectedSubreddit} (${sortedPosts.length})`
                   : 'Latest Posts'
               }
             </h2>
@@ -182,10 +286,10 @@ function App() {
               <div className="App-error">
                 <p>❌ {error}</p>
               </div>
-            ) : filteredPosts.length > 0 ? (
-              // Display filtered posts
+            ) : sortedPosts.length > 0 ? (
+              // Display filtered and sorted posts
               <div className="App-posts">
-                {filteredPosts.map((post) => (
+                {sortedPosts.map((post) => (
                   <PostCard 
                     key={post.id}
                     post={post}
