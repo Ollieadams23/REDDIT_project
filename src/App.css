@@ -18,25 +18,64 @@
 
 /* 
  * Header section
+ * RESPONSIVE: Uses flexbox for mobile menu button positioning
  */
 .App-header {
   background-color: #FF4500;
   color: white;
-  padding: 20px;
+  padding: 16px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
+  position: relative; /* For absolute positioning of menu button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.App-header-content {
+  flex: 1; /* Takes up remaining space */
 }
 
 .App-header h1 {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px; /* Smaller on mobile */
   font-weight: 700;
 }
 
 .App-header p {
-  margin: 8px 0 0 0;
-  font-size: 14px;
+  margin: 4px 0 0 0;
+  font-size: 12px; /* Smaller on mobile */
   opacity: 0.9;
+}
+
+/* 
+ * RESPONSIVE: Mobile menu button
+ * Hidden by default (desktop), shown on mobile via media query
+ */
+.App-mobile-menu-btn {
+  display: none; /* Hidden on desktop */
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%); /* Perfect vertical centering */
+  background: none;
+  border: 2px solid white;
+  color: white;
+  font-size: 24px;
+  width: 44px; /* Minimum touch target size */
+  height: 44px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  z-index: 1001; /* Above sidebar */
+}
+
+.App-mobile-menu-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.App-mobile-menu-btn:active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* 
@@ -55,6 +94,47 @@
   display: flex;
   gap: 24px;
   align-items: flex-start;
+  position: relative; /* For sidebar positioning */
+}
+
+/*
+ * RESPONSIVE: Sidebar wrapper
+ * On mobile: Hidden by default, slides in from left when open
+ * On desktop: Always visible, normal flow
+ */
+.App-sidebar-wrapper {
+  /* Mobile styles (default) */
+  position: fixed;
+  top: 0;
+  left: -280px; /* Hidden off-screen to the left */
+  width: 250px;
+  height: 100vh;
+  background-color: #FFFFFF;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease; /* Smooth slide animation */
+  z-index: 1000; /* Above content */
+  overflow-y: auto; /* Scroll if content is tall */
+  padding-top: 80px; /* Space for header */
+}
+
+/* When menu is open on mobile */
+.App-sidebar-wrapper--open {
+  left: 0; /* Slide into view */
+}
+
+/*
+ * RESPONSIVE: Backdrop overlay
+ * Dark semi-transparent layer behind sidebar on mobile
+ */
+.App-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* 50% black */
+  z-index: 999; /* Below sidebar (1000), above content */
+  cursor: pointer; /* Indicates it's clickable */
 }
 
 /* 
@@ -177,23 +257,74 @@
 }
 
 /* 
- * Responsive Design - Tablet
+ * ===================================================================
+ * RESPONSIVE BREAKPOINTS
+ * ===================================================================
  */
-@media screen and (max-width: 768px) {
-  .App-main {
-    padding: 16px;
+
+/* 
+ * DESKTOP (min-width: 1025px)
+ * Sidebar shows normally, menu button hidden
+ * Only large screens get the always-visible sidebar
+ */
+@media screen and (min-width: 1025px) {
+  /* Show mobile menu button on larger screens */
+  .App-mobile-menu-btn {
+    display: none; /* Always hidden on desktop */
   }
 
+  /* Sidebar in normal document flow on desktop */
+  .App-sidebar-wrapper {
+    position: static; /* Not fixed */
+    width: auto;
+    height: auto;
+    box-shadow: none;
+    padding-top: 0;
+    left: 0; /* Reset mobile offset */
+  }
+
+  /* Header text larger on desktop */
   .App-header h1 {
-    font-size: 24px;
+    font-size: 28px;
+  }
+
+  .App-header p {
+    font-size: 14px;
+  }
+}
+
+/* 
+ * MOBILE/TABLET (max-width: 1024px)
+ * Sidebar becomes slide-out menu, hamburger button shows
+ * Covers phones, tablets, and small laptops
+ */
+@media screen and (max-width: 1024px) {
+  /* Show hamburger button */
+  .App-mobile-menu-btn {
+    display: block;
+  }
+
+  .App-main {
+    padding: 12px;
   }
 
   .App-container {
     flex-direction: column;
+    gap: 16px;
+  }
+
+  .App-content {
+    flex: 1;
+    width: 100%;
   }
 
   .App-content h2 {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  /* Make posts full width on mobile */
+  .App-posts {
+    gap: 12px;
   }
 }
 

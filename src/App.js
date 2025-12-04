@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import './App.css';
 import PostCard from './components/PostCard';
+import PostCardSkeleton from './components/PostCardSkeleton';
 import PostDetail from './components/PostDetail';
 import SearchBar from './components/SearchBar';
 import Sidebar from './components/Sidebar';
@@ -41,6 +42,12 @@ function App() {
    * postId = detail view for that post
    */
   const [selectedPostId, setSelectedPostId] = useState(null);
+
+  /**
+   * RESPONSIVE DESIGN: Track if mobile menu is open
+   * On mobile, sidebar is hidden by default and opens when this is true
+   */
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   /**
    * Select data from Redux store
@@ -104,18 +111,22 @@ function App() {
   /**
    * Handle when subreddit filter changes
    * The useEffect will automatically fetch new data when subreddit changes
+   * RESPONSIVE: Close mobile menu after selection
    */
   const handleSubredditChange = (subreddit) => {
     dispatch(setSubreddit(subreddit));
+    setIsMobileMenuOpen(false);
   };
 
   /**
    * Handle when sort order changes
    * 
    * Updates Redux state which triggers re-sorting
+   * RESPONSIVE: Close mobile menu after selection
    */
   const handleSortChange = (sort) => {
     dispatch(setSortBy(sort));
+    setIsMobileMenuOpen(false);
   };
 
   /**
@@ -123,9 +134,11 @@ function App() {
    * 
    * Updates Redux state which triggers re-filtering
    * Only applies when sortBy is 'top'
+   * RESPONSIVE: Close mobile menu after selection
    */
   const handleTimeFilterChange = (time) => {
     dispatch(setTimeFilter(time));
+    setIsMobileMenuOpen(false);
   };
 
   /**
@@ -150,6 +163,14 @@ function App() {
    */
   const handleBackToFeed = () => {
     setSelectedPostId(null);
+  };
+
+  /**
+   * RESPONSIVE: Toggle mobile menu
+   * This opens/closes the sidebar on mobile devices
+   */
+  const handleToggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   /**
@@ -201,23 +222,46 @@ function App() {
     <div className="App">
       {/* Header */}
       <header className="App-header">
-        <h1>🔴 Reddit Client</h1>
-        <p>A React & Redux app for browsing Reddit</p>
+        {/* RESPONSIVE: Hamburger menu button (only shows on mobile) */}
+        <button 
+          className="App-mobile-menu-btn"
+          onClick={handleToggleMobileMenu}
+          aria-label="Toggle menu"
+          aria-expanded={isMobileMenuOpen}
+        >
+          {isMobileMenuOpen ? '✕' : '☰'}
+        </button>
+
+        <div className="App-header-content">
+          <h1>🔴 Reddit Client</h1>
+          <p>A React & Redux app for browsing Reddit</p>
+        </div>
       </header>
+
+      {/* RESPONSIVE: Backdrop overlay (mobile only) */}
+      {isMobileMenuOpen && (
+        <div 
+          className="App-backdrop"
+          onClick={handleToggleMobileMenu}
+          aria-label="Close menu"
+        />
+      )}
 
       {/* Main content */}
       <main className="App-main">
         <div className="App-container">
-          {/* Sidebar with filters */}
-          <Sidebar
-            selectedSubreddit={selectedSubreddit}
-            sortBy={sortBy}
-            timeFilter={timeFilter}
-            onSubredditChange={handleSubredditChange}
-            onSortChange={handleSortChange}
-            onTimeFilterChange={handleTimeFilterChange}
-            onReset={handleResetFilters}
-          />
+          {/* RESPONSIVE: Sidebar - Add class to show/hide on mobile */}
+          <div className={`App-sidebar-wrapper ${isMobileMenuOpen ? 'App-sidebar-wrapper--open' : ''}`}>
+            <Sidebar
+              selectedSubreddit={selectedSubreddit}
+              sortBy={sortBy}
+              timeFilter={timeFilter}
+              onSubredditChange={handleSubredditChange}
+              onSortChange={handleSortChange}
+              onTimeFilterChange={handleTimeFilterChange}
+              onReset={handleResetFilters}
+            />
+          </div>
 
           {/* Main content area */}
           <div className="App-content">
@@ -238,10 +282,13 @@ function App() {
               }
             </h2>
             
-            {/* Loading state */}
+            {/* Loading state - Show skeleton cards */}
             {isLoading ? (
-              <div className="App-loading">
-                <p>Loading posts...</p>
+              <div className="App-posts">
+                {/* Render 5 skeleton cards while loading */}
+                {[...Array(5)].map((_, index) => (
+                  <PostCardSkeleton key={`skeleton-${index}`} />
+                ))}
               </div>
             ) : error ? (
               // Error state

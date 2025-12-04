@@ -1,0 +1,159 @@
+/**
+ * PostCardSkeleton Styles
+ * 
+ * Creates loading placeholder with shimmer animation
+ * Mimics the real PostCard component structure
+ */
+
+/* 
+ * SHIMMER ANIMATION
+ * This is the magic! Creates a moving gradient effect
+ */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* 
+ * Main skeleton card container
+ * Matches PostCard dimensions and layout
+ */
+.post-card-skeleton {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid #CCCCCC;
+  border-radius: 8px;
+  cursor: default;
+  /* Shimmer effect applied to all child elements */
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    #f0f0f0 0%,
+    #f8f8f8 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* 
+ * Vote section (left side)
+ */
+.post-card-skeleton__votes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 40px;
+}
+
+.post-card-skeleton__vote-btn {
+  width: 24px;
+  height: 24px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.post-card-skeleton__score {
+  width: 32px;
+  height: 16px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+/* 
+ * Thumbnail placeholder
+ */
+.post-card-skeleton__thumbnail {
+  width: 96px;
+  height: 96px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  flex-shrink: 0; /* Don't let it shrink on small screens */
+}
+
+/* 
+ * Content section (right side)
+ */
+.post-card-skeleton__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 
+ * Title lines
+ */
+.post-card-skeleton__title-line {
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* Shorter second line for realism */
+.post-card-skeleton__title-line--short {
+  width: 70%;
+}
+
+/* 
+ * Metadata row (subreddit, author, time)
+ */
+.post-card-skeleton__meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.post-card-skeleton__meta-item {
+  height: 14px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+.post-card-skeleton__meta-item:nth-child(1) {
+  width: 80px; /* Subreddit */
+}
+
+.post-card-skeleton__meta-item:nth-child(2) {
+  width: 100px; /* Author */
+}
+
+.post-card-skeleton__meta-item:nth-child(3) {
+  width: 70px; /* Time */
+}
+
+/* 
+ * Comments count
+ */
+.post-card-skeleton__comments {
+  width: 120px;
+  height: 14px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+/* 
+ * RESPONSIVE: Mobile adjustments
+ */
+@media screen and (max-width: 768px) {
+  .post-card-skeleton__thumbnail {
+    width: 70px;
+    height: 70px;
+  }
+
+  .post-card-skeleton__votes {
+    width: 32px;
+  }
+
+  .post-card-skeleton__title-line {
+    height: 16px;
+  }
+}
