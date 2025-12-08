@@ -208,7 +208,8 @@ const PostDetail = ({ postId, onBack }) => {
           {post.is_video && post.videoUrl && (
             <div className="post-detail__video">
               <video 
-                controls 
+                controls
+                controlsList="nodownload"
                 className="post-detail__video-player"
                 poster={post.thumbnail && post.thumbnail !== 'self' ? post.thumbnail : undefined}
               >

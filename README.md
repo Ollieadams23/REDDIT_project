@@ -1,8 +1,8 @@
-# Reddit Client
+# Reddify
 
-A modern, responsive Reddit client built with React and Redux, featuring real-time post browsing, search functionality, and an elegant user interface.
+Reddify - A modern, responsive Reddit client built with React and Redux, featuring real-time post browsing, search functionality, and an elegant user interface.
 
-![Reddit Client](https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat&logo=react)
+![Reddify](https://img.shields.io/badge/React-18.3.1-61DAFB?style=flat&logo=react)
 ![Redux](https://img.shields.io/badge/Redux-5.0.1-764ABC?style=flat&logo=redux)
 ![Tests](https://img.shields.io/badge/Tests-112%20Passed-success)
 
@@ -22,7 +22,7 @@ A modern, responsive Reddit client built with React and Redux, featuring real-ti
 ### Desktop View
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Reddit Client        🔍 Search...           ☰ Subreddits   │
+│  Reddify              🔍 Search...           ☰ Subreddits   │
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
 │  ┌─────────────────────────────────────┐  ┌──────────────┐ │
@@ -46,7 +46,7 @@ A modern, responsive Reddit client built with React and Redux, featuring real-ti
 ### Mobile View
 ```
 ┌──────────────────────┐
-│  ☰  Reddit  🔍      │
+│  ☰  Reddify  🔍     │
 ├──────────────────────┤
 │                      │
 │  ┌────────────────┐ │

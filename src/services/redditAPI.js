@@ -30,6 +30,46 @@ const REDDIT_HEADERS = {
 };
 
 /**
+ * Rate limit handling
+ * Reddit API limit: 10 requests per minute (1 request every 6 seconds)
+ */
+const RATE_LIMIT_RETRY_DELAY = 10000; // 10 seconds
+const MAX_RETRIES = 2;
+
+/**
+ * Helper function to handle API requests with rate limit retry logic
+ * 
+ * @param {string} url - The URL to fetch
+ * @param {number} retryCount - Current retry attempt
+ * @returns {Promise<Response>} Fetch response
+ */
+const fetchWithRateLimit = async (url, retryCount = 0) => {
+  const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`, {
+    headers: REDDIT_HEADERS,
+  });
+  
+  // Check for rate limit error (429 Too Many Requests)
+  if (response.status === 429 && retryCount < MAX_RETRIES) {
+    console.warn(`Rate limit hit. Retrying in ${RATE_LIMIT_RETRY_DELAY / 1000} seconds... (Attempt ${retryCount + 1}/${MAX_RETRIES})`);
+    
+    // Wait before retrying
+    await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_RETRY_DELAY));
+    
+    // Retry the request
+    return fetchWithRateLimit(url, retryCount + 1);
+  }
+  
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new Error('Reddit API rate limit exceeded. Please wait a minute and try again.');
+    }
+    throw new Error(`Reddit API error: ${response.status} ${response.statusText}`);
+  }
+  
+  return response;
+};
+
+/**
  * Fetch posts from a subreddit
  * 
  * @param {string} subreddit - The subreddit name (e.g., 'pics', 'all')
@@ -58,14 +98,7 @@ export const fetchSubredditPosts = async (
       url += `&after=${after}`;
     }
 
-    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`, {
-      headers: REDDIT_HEADERS,
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Reddit API error: ${response.status} ${response.statusText}`);
-    }
-
+    const response = await fetchWithRateLimit(url);
     const data = await response.json();
     
     // Reddit wraps posts in a specific structure
@@ -91,14 +124,7 @@ export const fetchPostWithComments = async (subreddit, postId) => {
   try {
     const url = `${REDDIT_BASE_URL}/r/${subreddit}/comments/${postId}.json`;
     
-    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`, {
-      headers: REDDIT_HEADERS,
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Reddit API error: ${response.status} ${response.statusText}`);
-    }
-
+    const response = await fetchWithRateLimit(url);
     const data = await response.json();
     
     // Reddit returns [postData, commentsData]
@@ -169,14 +195,7 @@ export const searchPosts = async (
       url += `&after=${after}`;
     }
     
-    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`, {
-      headers: REDDIT_HEADERS,
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Reddit API error: ${response.status} ${response.statusText}`);
-    }
-
+    const response = await fetchWithRateLimit(url);
     const data = await response.json();
     
     return {

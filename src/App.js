@@ -221,7 +221,7 @@ function App() {
       <div className="App">
         {/* Header */}
         <header className="App-header">
-          <h1>🔴 Reddit Client</h1>
+          <h1>🔴 Reddify</h1>
           <p>A React & Redux app for browsing Reddit</p>
         </header>
 
@@ -260,7 +260,7 @@ function App() {
         </button>
 
         <div className="App-header-content">
-          <h1>🔴 Reddit Client</h1>
+          <h1>🔴 Reddify</h1>
           <p>A React & Redux app for browsing Reddit</p>
         </div>
       </header>
