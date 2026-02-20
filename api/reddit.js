@@ -9,7 +9,8 @@ export default async function handler(req, res) {
   try {
     const redditRes = await fetch(url, {
       headers: {
-        'User-Agent': 'web:reddit-clone-app:v1.0.0 (by /u/RedditClone)',
+        // Use a unique and descriptive User-Agent as recommended by Reddit API guidelines
+        'User-Agent': 'web:reddify.vercel.app:v1.0.0 (by /u/Ollieadams23)',
       },
     });
     const contentType = redditRes.headers.get('content-type');
