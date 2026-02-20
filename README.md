@@ -99,6 +99,25 @@ Reddify - A modern, responsive Reddit client built with React and Redux, featuri
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## 🌐 Reddit API Proxying
+
+### Why Proxy Reddit API Requests?
+Reddit blocks direct browser requests due to CORS restrictions and strict User-Agent requirements. To ensure reliable access to Reddit data, this app uses a backend proxy:
+
+- **Development:** Uses a public CORS proxy for convenience (may be unreliable).
+- **Production (Vercel):** Uses a custom API route (`/api/reddit`) to securely proxy requests server-side, avoiding CORS and 403 errors.
+
+### How It Works
+- The frontend sends requests to `/api/reddit?url=<reddit-endpoint>`.
+- The API route fetches Reddit data with proper headers and returns it to the frontend.
+- This approach works seamlessly on Vercel and in local development.
+
+### Updating or Deploying
+- No extra server setup needed—Vercel API routes are serverless.
+- If you fork or clone, make sure to deploy to Vercel for full functionality.
+
+---
+
 ## 🛠 Technologies Used
 
 ### Core Technologies
@@ -114,7 +133,8 @@ Reddify - A modern, responsive Reddit client built with React and Redux, featuri
 
 ### API Integration
 - **Reddit JSON API** - Public Reddit API for fetching posts and comments
-- **CORS Proxy** - Proxy service to handle CORS restrictions
+- **CORS Proxy** - Used in development only
+- **Vercel API Route** - Used in production for secure Reddit requests
 
 ### Styling
 - **CSS3** - Custom styling with modern CSS features
@@ -396,5 +416,3 @@ This project is open source and available under the [MIT License](LICENSE).
 - [Reddit API documentation](https://www.reddit.com/dev/api/)
 
 ---
-
-**Built with ❤️ using React and Redux**

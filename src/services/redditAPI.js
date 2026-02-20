@@ -44,7 +44,12 @@ const MAX_RETRIES = 2;
  * @returns {Promise<Response>} Fetch response
  */
 const fetchWithRateLimit = async (url, retryCount = 0) => {
-  const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`, {
+  // Use Vercel API route for production, fallback to CORS proxy for local/dev
+  const apiUrl =
+    process.env.NODE_ENV === 'production'
+      ? `/api/reddit?url=${encodeURIComponent(url)}`
+      : `${CORS_PROXY}${encodeURIComponent(url)}`;
+  const response = await fetch(apiUrl, {
     headers: REDDIT_HEADERS,
   });
   
